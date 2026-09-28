@@ -1,3 +1,18 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+import { getAuth, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink, signOut } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDxJnIzXzUk5is4fp0TQkym7kr9PUcnzyw",
+  authDomain: "thunder-a509a.firebaseapp.com",
+  projectId: "thunder-a509a",
+  storageBucket: "thunder-a509a.firebasestorage.app",
+  messagingSenderId: "1037428395928",
+  appId: "1:1037428395928:web:d972c6c6ff7b5c3cd025ed"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
 const API_URL = 'https://thunder-backend-esf1.onrender.com/api';
 
 let isAdminUnlocked = false; 
@@ -26,7 +41,7 @@ function enforceDateRules() {
     return localDate;
 }
 
-function openTab(evt, tabName) {
+window.openTab = function(evt, tabName) {
     let tabContents = document.getElementsByClassName("tab-content");
     for (let i = 0; i < tabContents.length; i++) tabContents[i].classList.remove("active");
     
@@ -52,7 +67,7 @@ function openTab(evt, tabName) {
     }
 }
 
-function changeGlobalSort(val) {
+window.changeGlobalSort = function(val) {
     let activeTab = 'expense-section'; 
     const activeTabEl = document.querySelector('.tab-content.active');
     if (activeTabEl) activeTab = activeTabEl.id;
@@ -61,7 +76,7 @@ function changeGlobalSort(val) {
     processAndRenderTables();
 }
 
-function setView(tabId, viewName, btnElement) {
+window.setView = function(tabId, viewName, btnElement) {
     currentViews[tabId] = viewName;
     currentSubFilters[tabId] = ''; 
     const container = btnElement.parentElement;
@@ -100,8 +115,8 @@ function updateSubFilterUI(tabId, viewName) {
     }
 }
 
-function changeSubFilter(tabId, val) { currentSubFilters[tabId] = val; currentPage = 1; processAndRenderTables(); }
-function saveWeekStartDay() { localStorage.setItem('weekStartDay', document.getElementById('week-start-day').value); processAndRenderTables(); }
+window.changeSubFilter = function(tabId, val) { currentSubFilters[tabId] = val; currentPage = 1; processAndRenderTables(); }
+window.saveWeekStartDay = function() { localStorage.setItem('weekStartDay', document.getElementById('week-start-day').value); processAndRenderTables(); }
 
 async function loadData() {
     enforceDateRules(); 
@@ -210,8 +225,8 @@ function renderDashboard() {
     });
 }
 
-function prevPage() { if (currentPage > 1) { currentPage--; processAndRenderTables(); } }
-function nextPage() { currentPage++; processAndRenderTables(); }
+window.prevPage = function() { if (currentPage > 1) { currentPage--; processAndRenderTables(); } }
+window.nextPage = function() { currentPage++; processAndRenderTables(); }
 
 function processAndRenderTables() {
     let activeTab = 'expense-section'; 
@@ -287,7 +302,7 @@ function processAndRenderTables() {
 
 // --- PDF GENERATION ENGINE WITH FOOTER TOTALS ---
 
-function exportTabToPDF() {
+window.exportTabToPDF = function() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('landscape'); 
 
@@ -377,7 +392,7 @@ function exportTabToPDF() {
     doc.save(`Thunder_${tabTitle.replace(/\s+/g, '_')}_${new Date().getTime()}.pdf`);
 }
 
-function generateMasterPDF() {
+window.generateMasterPDF = function() {
     const start = document.getElementById('master-export-start').value;
     const end = document.getElementById('master-export-end').value;
 
@@ -428,7 +443,7 @@ function generateMasterPDF() {
     doc.save(`Thunder_Master_Export_${start}_to_${end}.pdf`);
 }
 
-function cloneEntry(id) {
+window.cloneEntry = function(id) {
     const t = masterTransactions.find(x => x._id === id);
     if(!t) return;
     
@@ -463,7 +478,7 @@ function renderTables(transactions, auditLogs, activeTab) {
         const delBtn = isAdminUnlocked ? `<button class="del-btn" onclick="deleteEntry('${t._id}')">Delete</button>` : `<button class="del-btn" disabled style="opacity: 0.3; cursor:not-allowed;">Locked</button>`;
         const actionCell = `${cloneBtn} ${editBtn} ${delBtn}`;
 
-        let displayNote = t.notes || '-'; // Inline badge removed based on preference
+        let displayNote = t.notes || '-';
 
         if (activeTab === 'expense-section' && t.type === 'Expense') {
             expenseTotal += amt;
@@ -525,7 +540,7 @@ function renderTables(transactions, auditLogs, activeTab) {
     }
 }
 
-function runUniversalSearch() {
+window.runUniversalSearch = function() {
     const query = document.getElementById('uni-search').value.toLowerCase().trim();
     const type = document.getElementById('uni-type').value;
     const start = document.getElementById('uni-start').value;
@@ -572,7 +587,7 @@ function runUniversalSearch() {
     });
 }
 
-function clearUniversalSearch() {
+window.clearUniversalSearch = function() {
     document.getElementById('uni-search').value = '';
     document.getElementById('uni-type').value = '';
     document.getElementById('uni-start').value = '';
@@ -631,7 +646,7 @@ document.getElementById('entry-form').addEventListener('submit', async (e) => {
     loadData();
 });
 
-function openEditModal(id, date, type, particulars, amount, category, account, notes, recordedBy) {
+window.openEditModal = function(id, date, type, particulars, amount, category, account, notes, recordedBy) {
     document.getElementById('edit-id').value = id;
     document.getElementById('edit-date').value = date;
     document.getElementById('edit-type').value = type;
@@ -652,7 +667,7 @@ function openEditModal(id, date, type, particulars, amount, category, account, n
     document.getElementById('edit-modal').style.display = 'flex';
 }
 
-function closeEditModal() {
+window.closeEditModal = function() {
     document.getElementById('edit-modal').style.display = 'none';
     document.getElementById('edit-form').reset();
     document.getElementById('auth-editor-username').value = '';
@@ -690,12 +705,12 @@ document.getElementById('editor-creds-form').addEventListener('submit', async (e
     alert("Editor Credentials Saved Successfully!");
 });
 
-async function deleteEntry(id) {
+window.deleteEntry = async function(id) {
     if (!isAdminUnlocked) return alert("Security Block: Please log in via the Settings tab to delete records.");
     if (confirm("Move to Audit Trail?")) { await fetch(`${API_URL}/transactions/${id}`, { method: 'DELETE', headers: { 'admin-access': 'true' } }); loadData(); }
 }
 
-async function restoreEntry(id) {
+window.restoreEntry = async function(id) {
     if (confirm("Restore this record back to the Master Ledger?")) { await fetch(`${API_URL}/audit/restore/${id}`, { method: 'POST' }); alert("Record Restored!"); loadData(); }
 }
 
@@ -707,7 +722,7 @@ document.getElementById('category-form').addEventListener('submit', async (e) =>
     loadData();
 });
 
-async function deleteCategory(id) {
+window.deleteCategory = async function(id) {
     if (confirm("Delete this category?")) { await fetch(`${API_URL}/categories/${id}`, { method: 'DELETE' }); loadData(); }
 }
 
@@ -719,56 +734,14 @@ document.getElementById('balance-form').addEventListener('submit', async (e) => 
     alert("Opening Balances Updated!"); loadData(); 
 });
 
-document.getElementById('admin-login-step1').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const id = document.getElementById('admin-id').value;
-    const pass = document.getElementById('admin-pass').value;
-    const verifyRes = await fetch(`${API_URL}/security/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, pass }) });
-    if (verifyRes.ok) {
-        alert("Credentials Verified! Requesting OTP...");
-        const res = await fetch(`${API_URL}/security/send-otp`, { method: 'POST' });
-        const data = await res.json();
-        if (res.ok) { document.getElementById('admin-login-step1').style.display = 'none'; document.getElementById('admin-login-step2').style.display = 'flex'; } else { alert("Error: " + data.error); }
-    } else { alert("Access Denied: Incorrect ID or Password."); }
-});
-
-document.getElementById('admin-login-step2').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const otp = document.getElementById('admin-otp').value.trim();
-    const res = await fetch(`${API_URL}/security/verify-otp`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ otp }) });
-    const data = await res.json();
-    if (res.ok) {
-        isAdminUnlocked = true;
-        document.getElementById('admin-login-box').style.display = 'none';
-        document.getElementById('admin-zone').style.display = 'block';
-        document.getElementById('audit-tab-btn').style.display = 'inline-block';
-        alert("Administrator Access Granted!");
-        loadData(); 
-    } else { alert(data.error || "Invalid OTP"); }
-});
-
-function logoutAdmin() {
-    isAdminUnlocked = false;
-    document.getElementById('admin-zone').style.display = 'none';
-    document.getElementById('audit-tab-btn').style.display = 'none';
-    document.getElementById('admin-login-box').style.display = 'block';
-    document.getElementById('admin-login-step1').style.display = 'flex';
-    document.getElementById('admin-login-step2').style.display = 'none';
-    document.getElementById('admin-id').value = '';
-    document.getElementById('admin-pass').value = '';
-    document.getElementById('admin-otp').value = '';
-    openTab({ currentTarget: document.querySelector('button[onclick*="settings-section"]') }, 'settings-section');
-    alert("Logged out securely."); loadData(); 
-}
-
-async function requestOTP() {
+window.requestOTP = async function() {
     alert("Sending OTP to your email...");
     const res = await fetch(`${API_URL}/security/send-otp`, { method: 'POST' });
     const data = await res.json();
     alert(data.message || data.error);
 }
 
-async function executeReset() {
+window.executeReset = async function() {
     const otp = document.getElementById('reset-otp').value.trim();
     const phrase = document.getElementById('reset-phrase').value.trim(); 
     if(!otp || !phrase) return alert("Fill out both OTP and Phrase.");
@@ -777,7 +750,7 @@ async function executeReset() {
     if(res.ok) { alert("Success: " + data.message); document.getElementById('reset-otp').value = ''; document.getElementById('reset-phrase').value = ''; loadData(); } else { alert("Error: " + data.error); }
 }
 
-async function requestWipe() {
+window.requestWipe = async function() {
     if(confirm("Start the cooling period to wipe the entire database?")) {
         const res = await fetch(`${API_URL}/security/request-wipe`, { method: 'POST' });
         const data = await res.json();
@@ -785,7 +758,7 @@ async function requestWipe() {
     }
 }
 
-async function executeWipe() {
+window.executeWipe = async function() {
     const otp = document.getElementById('wipe-otp').value.trim();
     const phrase = document.getElementById('wipe-phrase').value.trim();
     if(!otp || !phrase) return alert("Fill out both OTP and Phrase.");
@@ -799,9 +772,87 @@ document.getElementById('type').addEventListener('change', function(e) {
     if (e.target.value === 'Receipt' || e.target.value === 'Contra') { catSelect.disabled = true; catSelect.required = false; catSelect.value = ''; } else { catSelect.disabled = false; catSelect.required = true; }
 });
 
-document.getElementById('edit-type').addEventListener('change', function(e) {
-    const editCatSelect = document.getElementById('edit-category');
-    if (e.target.value === 'Receipt' || e.target.value === 'Contra') { editCatSelect.disabled = true; editCatSelect.value = ''; } else { editCatSelect.disabled = false; }
-});
+if(document.getElementById('edit-type')) {
+    document.getElementById('edit-type').addEventListener('change', function(e) {
+        const editCatSelect = document.getElementById('edit-category');
+        if (e.target.value === 'Receipt' || e.target.value === 'Contra') { editCatSelect.disabled = true; editCatSelect.value = ''; } else { editCatSelect.disabled = false; }
+    });
+}
 
+// -------------------------------------------------------------
+// FIREBASE AUTHENTICATION LOGIC (Replaces Old OTP Logic)
+// -------------------------------------------------------------
+
+// 1. Handle the "Send Login Link" button
+const loginForm = document.getElementById('firebase-login-form');
+if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('admin-email').value;
+        const btn = document.getElementById('send-link-btn');
+        
+        const actionCodeSettings = {
+            url: window.location.origin + window.location.pathname, 
+            handleCodeInApp: true,
+        };
+        
+        try {
+            btn.innerText = "Sending...";
+            btn.disabled = true;
+            
+            await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+            window.localStorage.setItem('emailForSignIn', email);
+            
+            document.getElementById('email-sent-msg').style.display = 'block';
+            btn.innerText = "Send Login Link";
+            btn.disabled = false;
+        } catch (error) {
+            alert("Error sending email: " + error.message);
+            btn.innerText = "Send Login Link";
+            btn.disabled = false;
+        }
+    });
+}
+
+// 2. Catch the user when they return from the email link
+if (isSignInWithEmailLink(auth, window.location.href)) {
+    let email = window.localStorage.getItem('emailForSignIn');
+    if (!email) {
+        email = window.prompt('Please confirm your email address to complete login:');
+    }
+
+    signInWithEmailLink(auth, email, window.location.href)
+        .then((result) => {
+            window.localStorage.removeItem('emailForSignIn');
+            window.history.replaceState({}, document.title, window.location.pathname);
+            
+            isAdminUnlocked = true;
+            document.getElementById('admin-login-box').style.display = 'none';
+            document.getElementById('admin-zone').style.display = 'block';
+            document.getElementById('audit-tab-btn').style.display = 'inline-block';
+            alert("Administrator Access Granted!");
+            loadData();
+        })
+        .catch((error) => {
+            console.error("Error signing in:", error);
+            alert("Login link expired or invalid.");
+        });
+}
+
+// 3. New Secure Logout
+window.logoutAdmin = function() {
+    signOut(auth).then(() => {
+        isAdminUnlocked = false;
+        document.getElementById('admin-zone').style.display = 'none';
+        document.getElementById('audit-tab-btn').style.display = 'none';
+        document.getElementById('admin-login-box').style.display = 'block';
+        document.getElementById('email-sent-msg').style.display = 'none';
+        document.getElementById('admin-email').value = '';
+        openTab({ currentTarget: document.querySelector('button[onclick*="settings-section"]') }, 'settings-section');
+        alert("Logged out securely."); 
+        loadData();
+    });
+};
+
+// Initialize Application Data
 loadData();
