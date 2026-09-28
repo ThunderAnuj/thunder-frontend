@@ -264,17 +264,19 @@
         <!-- SETTINGS -->
         <div id="settings-section" class="tab-content">
             <div id="admin-login-box" class="admin-panel">
-                <h2 style="color: #ff0844;">Administrator Access</h2>
-                <form id="admin-login-step1" class="flex-row">
-                    <div class="flex-1"><label style="margin-top:0;">Admin ID</label><input type="text" id="admin-id" required></div>
-                    <div class="flex-1"><label style="margin-top:0;">Password</label><input type="password" id="admin-pass" required></div>
-                    <button type="submit" class="action-btn" style="margin: 0;">Verify</button>
-                </form>
-                <form id="admin-login-step2" class="flex-row" style="display: none; margin-top: 15px;">
-                    <div class="flex-1"><label style="margin-top:0; color: #10b981;">✅ OTP Sent to Email</label><input type="text" id="admin-otp" placeholder="Enter 6-digit code" required></div>
-                    <button type="submit" class="action-btn" style="margin: 0; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: #064e3b;">Unlock Settings</button>
-                </form>
-            </div>
+    <h2 style="color: #ff0844;">Administrator Access</h2>
+    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Enter your admin email to receive a secure login link.</p>
+    <form id="firebase-login-form" class="flex-row">
+        <div class="flex-1">
+            <label style="margin-top:0;">Admin Email</label>
+            <input type="email" id="admin-email" placeholder="admin@example.com" required>
+        </div>
+        <button type="submit" class="action-btn" style="margin: 0;" id="send-link-btn">Send Login Link</button>
+    </form>
+    <div id="email-sent-msg" style="display: none; margin-top: 15px; color: #10b981; font-weight: bold;">
+        ✅ Secure link sent! Please check your inbox.
+    </div>
+</div>
 
             <div id="admin-zone" style="display: none;">
                 
