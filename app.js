@@ -816,6 +816,16 @@ onAuthStateChanged(auth, async (user) => {
         // FIX: Changed 'block' to 'flex' so the dashboard sits next to the sidebar
         document.querySelector('.app-window').style.display = 'flex'; 
         
+        // --- NEW: POPULATE PROFILE PAGE ---
+        if (user.displayName) {
+            const userDetails = user.displayName.split(' | ');
+            document.getElementById('profile-username').innerText = userDetails[0] || 'N/A';
+            document.getElementById('profile-fullname').innerText = userDetails[1] || 'N/A';
+            document.getElementById('profile-phone').innerText = userDetails[2] || 'N/A';
+        }
+        document.getElementById('profile-email').innerText = user.email || 'N/A';
+        // ----------------------------------
+        
         // Load data and force the dashboard to render immediately
         await loadData();
         renderDashboard();
@@ -920,49 +930,35 @@ window.globalLogout = function() {
     });
 };
 
-// 5. ADMINISTRATOR ACCESS (Settings Zone Email Link)
-const adminLoginForm = document.getElementById('firebase-login-form');
-if (adminLoginForm) {
-    adminLoginForm.addEventListener('submit', async (e) => {
+// 5. SETTINGS AUTHENTICATION (PASSWORD LOCK)
+const settingsAuthForm = document.getElementById('settings-auth-form');
+if (settingsAuthForm) {
+    settingsAuthForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = document.getElementById('admin-email').value;
-        const btn = document.getElementById('send-link-btn');
+        const email = document.getElementById('settings-email').value;
+        const pass = document.getElementById('settings-password').value;
+        const errorEl = document.getElementById('settings-auth-error');
+        const btn = settingsAuthForm.querySelector('button');
         
-        const actionCodeSettings = {
-            url: window.location.origin + window.location.pathname, 
-            handleCodeInApp: true,
-        };
+        btn.innerText = "Verifying...";
         
         try {
-            btn.innerText = "Sending...";
-            btn.disabled = true;
-            await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-            window.localStorage.setItem('emailForSignIn', email);
-            document.getElementById('email-sent-msg').style.display = 'block';
-        } catch (error) {
-            alert("Error sending email: " + error.message);
-        } finally {
-            btn.innerText = "Send Login Link";
-            btn.disabled = false;
-        }
-    });
-}
-
-if (isSignInWithEmailLink(auth, window.location.href)) {
-    let email = window.localStorage.getItem('emailForSignIn');
-    if (!email) email = window.prompt('Please confirm your admin email address:');
-
-    signInWithEmailLink(auth, email, window.location.href)
-        .then(() => {
-            window.localStorage.removeItem('emailForSignIn');
-            window.history.replaceState({}, document.title, window.location.pathname);
+            // Re-authenticate using Firebase Email/Password
+            await signInWithEmailAndPassword(auth, email, pass);
+            
             isAdminUnlocked = true;
             document.getElementById('admin-login-box').style.display = 'none';
             document.getElementById('admin-zone').style.display = 'block';
             document.getElementById('audit-tab-btn').style.display = 'inline-block';
-            alert("Administrator Access Granted!");
-        })
-        .catch((error) => alert("Login link expired or invalid."));
+            errorEl.style.display = 'none';
+            settingsAuthForm.reset();
+        } catch (error) {
+            errorEl.innerText = "Access Denied: Incorrect Email or Password.";
+            errorEl.style.display = 'block';
+        } finally {
+            btn.innerText = "Unlock Settings";
+        }
+    });
 }
 
 window.logoutAdmin = function() {
@@ -970,8 +966,8 @@ window.logoutAdmin = function() {
     document.getElementById('admin-zone').style.display = 'none';
     document.getElementById('audit-tab-btn').style.display = 'none';
     document.getElementById('admin-login-box').style.display = 'block';
-    document.getElementById('email-sent-msg').style.display = 'none';
-    document.getElementById('admin-email').value = '';
-    openTab({ currentTarget: document.querySelector('button[onclick*="settings-section"]') }, 'settings-section');
-    alert("Logged out of Settings securely."); 
+    
+    // Send user back to the settings login screen
+    const settingsTabBtn = document.querySelector('button[onclick*="settings-section"]');
+    if(settingsTabBtn) openTab({ currentTarget: settingsTabBtn }, 'settings-section');
 };
