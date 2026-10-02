@@ -972,3 +972,116 @@ window.logoutAdmin = function() {
     const settingsTabBtn = document.querySelector('button[onclick*="settings-section"]');
     if(settingsTabBtn) openTab({ currentTarget: settingsTabBtn }, 'settings-section');
 };
+
+// ==========================================
+// CRITICAL OPERATIONS & RESTORE LOGIC
+// ==========================================
+
+// 1. Factory Reset (Confirmation Text)
+document.getElementById('factory-reset-btn').addEventListener('click', async () => {
+    const confirmText = document.getElementById('reset-confirm-input').value;
+    if (confirmText !== 'CLEAR-BALANCES') {
+        return alert('Please type CLEAR-BALANCES exactly as shown to confirm.');
+    }
+    
+    try {
+        const res = await fetch('/api/reset-balances', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: auth.currentUser.uid })
+        });
+        if(res.ok) {
+            alert('Your opening balances have been successfully reset.');
+            document.getElementById('reset-confirm-input').value = '';
+            location.reload(); // Refresh to update UI
+        }
+    } catch (err) {
+        console.error('Reset failed:', err);
+    }
+});
+
+// 2. Deep Clean 1-Hour Timer
+let deepCleanTimer;
+let timeLeft = 3600; // 3600 seconds = 1 hour
+
+document.getElementById('initiate-clean-btn').addEventListener('click', () => {
+    const confirmText = document.getElementById('deep-clean-confirm-input').value;
+    if (confirmText !== 'DELETE-MY-DATA') {
+        return alert('Please type DELETE-MY-DATA exactly as shown to confirm.');
+    }
+    
+    // Hide inputs and show timer
+    document.getElementById('initiate-clean-btn').style.display = 'none';
+    document.getElementById('deep-clean-confirm-input').disabled = true;
+    document.getElementById('timer-container').style.display = 'block';
+    
+    timeLeft = 3600;
+    updateTimerUI();
+    
+    deepCleanTimer = setInterval(() => {
+        timeLeft--;
+        updateTimerUI();
+        if (timeLeft <= 0) {
+            clearInterval(deepCleanTimer);
+            executeDeepClean();
+        }
+    }, 1000);
+});
+
+document.getElementById('cancel-clean-btn').addEventListener('click', () => {
+    clearInterval(deepCleanTimer);
+    document.getElementById('initiate-clean-btn').style.display = 'inline-block';
+    document.getElementById('deep-clean-confirm-input').disabled = false;
+    document.getElementById('deep-clean-confirm-input').value = '';
+    document.getElementById('timer-container').style.display = 'none';
+    alert('Deep clean safely cancelled.');
+});
+
+function updateTimerUI() {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    document.getElementById('countdown-display').innerText = 
+        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+async function executeDeepClean() {
+    try {
+        const res = await fetch('/api/deep-clean', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: auth.currentUser.uid })
+        });
+        if(res.ok) {
+            alert('Your data has been completely and permanently deleted.');
+            auth.signOut().then(() => location.reload());
+        }
+    } catch (err) {
+        console.error('Clean failed:', err);
+    }
+}
+
+// 3. Restore Modified Transaction Function
+// Attach this to your dynamically generated 'Restore' buttons in the Audit Log
+window.restoreTransaction = async function(transactionId, originalAmount, logId) {
+    if(!confirm(`Are you sure you want to restore this transaction to ₹${originalAmount}?`)) return;
+
+    try {
+        const res = await fetch(`/api/restore-transaction/${transactionId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                userId: auth.currentUser.uid,
+                amount: Number(originalAmount),
+                logId: logId
+            })
+        });
+        if(res.ok) {
+            alert('Transaction successfully restored to its original amount!');
+            location.reload(); // Refresh to show restored ledger
+        } else {
+            alert('Failed to restore transaction.');
+        }
+    } catch (err) {
+        console.error('Restore failed:', err);
+    }
+};

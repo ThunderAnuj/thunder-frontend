@@ -416,31 +416,29 @@
                     </form>
                 </div>
 
-                <div class="danger-panel">
-                    <h2 style="color: #ef4444;">🚨 Critical Operations</h2>
-                    <div style="margin-bottom: 30px; background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--danger-border);">
-                        <h4>Factory Reset Balances</h4>
-                        <button class="secondary-btn" onclick="requestOTP()" style="margin-bottom: 15px; margin-top: 5px; border-color: #ef4444; color: #ef4444;">📩 Request OTP</button>
-                        <div class="flex-row">
-                            <input type="text" id="reset-otp" placeholder="6-digit OTP" class="flex-1">
-                            <input type="text" id="reset-phrase" placeholder="Type: CLEAR-BALANCES-PERMANENTLY" class="flex-1">
-                            <button onclick="executeReset()" style="background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%); color: white; border-radius: 10px; padding: 12px 20px; font-weight:bold; border:none; cursor:pointer; margin: 0;">Execute</button>
-                        </div>
-                    </div>
-                    <div style="background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--danger-border);">
-                        <h4>Deep Clean Database</h4>
-                        <div id="wipe-request-box"><button class="secondary-btn" onclick="requestWipe()" style="border-color: #ea580c; color: #ea580c; margin-top: 5px;">⏳ Initiate 24-Hour Timer</button></div>
-                        <div id="wipe-execute-box" style="display: none;">
-                            <p id="cooling-timer" style="color: #ea580c; font-weight: 700; margin: 10px 0; background:var(--danger-bg); padding: 10px; border-radius: 8px;"></p>
-                            <button class="secondary-btn" onclick="requestOTP()" style="margin-bottom: 15px; border-color: #ef4444; color: #ef4444;">📩 Request OTP</button>
-                            <div class="flex-row">
-                                <input type="text" id="wipe-otp" placeholder="OTP" class="flex-1">
-                                <input type="text" id="wipe-phrase" placeholder="Type: DEEP-CLEAN-ALL-DATA" class="flex-1">
-                                <button onclick="executeWipe()" style="background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%); color: white; border-radius: 10px; padding: 12px 20px; font-weight:bold; border:none; cursor:pointer; margin: 0;">Erase All Data</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- CRITICAL OPERATIONS SECTION -->
+<div class="critical-operations">
+    <h3>🚨 Critical Operations</h3>
+    
+    <div class="settings-card">
+        <h4>Factory Reset Balances</h4>
+        <p>Type <strong>CLEAR-BALANCES</strong> to reset your opening balances.</p>
+        <input type="text" id="reset-confirm-input" placeholder="Type CLEAR-BALANCES">
+        <button id="factory-reset-btn" class="danger-btn" style="margin-top: 10px;">Execute Reset</button>
+    </div>
+
+    <div class="settings-card" style="margin-top: 20px;">
+        <h4>Deep Clean Database (Your Data Only)</h4>
+        <p>Type <strong>DELETE-MY-DATA</strong> to start a 1-hour deletion timer for your personal records.</p>
+        <input type="text" id="deep-clean-confirm-input" placeholder="Type DELETE-MY-DATA">
+        <button id="initiate-clean-btn" class="danger-btn" style="margin-top: 10px;">Initiate 1-Hour Timer</button>
+        
+        <div id="timer-container" style="display: none; margin-top: 15px; padding: 10px; background: #ffe6e6; border-radius: 5px;">
+            <p style="color: red; font-weight: bold; margin-bottom: 10px;">Data deleting in: <span id="countdown-display">60:00</span></p>
+            <button id="cancel-clean-btn" class="safe-btn">Cancel Deletion</button>
+        </div>
+    </div>
+</div>
                 <button onclick="logoutAdmin()" class="secondary-btn" style="width: 100%; padding: 14px; margin-top: 10px;">🚪 Log Out of Settings</button>
             </div>
         </div>

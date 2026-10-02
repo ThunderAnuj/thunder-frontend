@@ -168,3 +168,14 @@ tfoot td { position: sticky; bottom: 0; background: var(--card-bg); z-index: 10;
     .edit-btn, .del-btn { flex: 1; margin: 0 !important; padding: 10px !important; font-size: 13px; border-radius: 8px; text-align: center;}
     td[data-label="Amount"] span { padding: 1px 4px !important; font-size: 9px !important; border-radius: 3px !important; }
 }
+/* LIGHT MODE INPUT FIXES */
+body.light-mode input, 
+body.light-mode select, 
+body.light-mode textarea {
+    background-color: #ffffff;
+    color: #1a1a2e;
+    border: 1px solid #ccc;
+}
+body.light-mode input::placeholder {
+    color: #888888;
+}
