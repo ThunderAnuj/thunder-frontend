@@ -2,12 +2,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebas
 import { getAuth, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDxJnIzXzUk5is4fp0TQkym7kr9PUcnzyw",
-  authDomain: "thunder-a509a.firebaseapp.com",
-  projectId: "thunder-a509a",
-  storageBucket: "thunder-a509a.firebasestorage.app",
-  messagingSenderId: "1037428395928",
-  appId: "1:1037428395928:web:d972c6c6ff7b5c3cd025ed"
+  apiKey: "AIzaSyBP8B2KiK_EWxhLrRgeC6uxy1ItYQNbGC4",
+  authDomain: "thunders-workshop.firebaseapp.com",
+  projectId: "thunders-workshop",
+  storageBucket: "thunders-workshop.firebasestorage.app",
+  messagingSenderId: "41571220343",
+  appId: "1:41571220343:web:ab370784eb0bb09810ff72",
+  measurementId: "G-MBLS2GL06X"
 };
 
 const app = initializeApp(firebaseConfig);
