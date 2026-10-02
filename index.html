@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Finance Tracker - Aurora Canvas</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+
+<!-- GLOBAL LOGIN WALL -->
+<div id="global-login-wall" style="position: fixed; inset: 0; background: var(--bg-color, #0f172a); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;">
+    
+    <div style="display: flex; flex-wrap: wrap; width: 100%; max-width: 850px; background: var(--card-bg, #1e293b); border: 1px solid var(--border-color, #334155); border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); overflow: hidden;">
+        
+        <!-- LEFT COLUMN: Forms -->
+        <div style="flex: 1 1 400px; padding: 40px;">
+            <h2 style="color: #10b981; margin-bottom: 5px; font-size: 24px;">Thunder Finance Tracker</h2>
+            <p style="color: #94a3b8; margin-bottom: 25px; font-size: 14px;">Secure Multi-User Ledger Access</p>
+            
+            <!-- Toggle Tabs -->
+            <div style="display: flex; gap: 10px; margin-bottom: 25px;">
+                <button onclick="toggleAuth('login')" id="tab-login" class="action-btn" style="flex: 1; margin: 0; background: #10b981; border: none;">Log In</button>
+                <button onclick="toggleAuth('signup')" id="tab-signup" class="secondary-btn" style="flex: 1; margin: 0; border: 1px solid #334155;">Sign Up</button>
+            </div>
+
+            <!-- LOG IN FORM -->
+            <form id="form-login" style="display: flex; flex-direction: column; gap: 15px;">
+                <input type="email" id="login-email" placeholder="Email Address" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white;">
+                <input type="password" id="login-password" placeholder="Password" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white;">
+                <button type="submit" class="action-btn" style="width: 100%; margin: 0; padding: 14px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);" id="btn-login">Access Vault</button>
+                <p id="error-login" style="color: #ef4444; font-size: 13px; display: none; font-weight: bold; margin: 0;"></p>
+            </form>
+
+            <!-- SIGN UP FORM -->
+            <form id="form-signup" style="display: none; flex-direction: column; gap: 15px;">
+                <input type="text" id="signup-fullname" placeholder="Full Name" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white;">
+                <input type="tel" id="signup-phone" placeholder="Phone Number" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white;">
+                <input type="text" id="signup-username" placeholder="Unique Username" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white;">
+                <input type="email" id="signup-email" placeholder="Email Address" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white;">
+                <input type="password" id="signup-password" placeholder="Create Password" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white;">
+                
+                <button type="submit" class="action-btn" style="width: 100%; margin: 0; padding: 14px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);" id="btn-signup">Create Account</button>
+                <p id="error-signup" style="color: #ef4444; font-size: 13px; display: none; font-weight: bold; margin: 0;"></p>
+            </form>
+        </div>
+
+        <!-- RIGHT COLUMN: Notes & Guidelines -->
+        <div style="flex: 1 1 350px; background: rgba(16, 185, 129, 0.05); padding: 40px; border-left: 1px solid var(--border-color, #334155); display: flex; flex-direction: column; justify-content: center;">
+            <h3 style="color: #fbbf24; margin-top: 0; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 22px;">⚠️</span> Important Guidelines
+            </h3>
+            <ul style="color: #cbd5e1; font-size: 14px; line-height: 1.6; margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 15px;">
+                <li><strong>No Recovery:</strong> Do not forget your Email & Password. We cannot recover encrypted data.</li>
+                <li><strong>Extract Regularly:</strong> For maximum performance, extract your data via PDF every 3 months.</li>
+                <li><strong>Routine Maintenance:</strong> Use the 'Deep Clean Database' setting quarterly to erase old records.</li>
+                <li><strong>Total Privacy:</strong> Your data is fully isolated via secure tokens. No other user can view your ledger.</li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function toggleAuth(view) {
+        document.getElementById('form-login').style.display = view === 'login' ? 'flex' : 'none';
+        document.getElementById('form-signup').style.display = view === 'signup' ? 'flex' : 'none';
+        
+        document.getElementById('tab-login').style.background = view === 'login' ? '#10b981' : 'transparent';
+        document.getElementById('tab-login').style.border = view === 'login' ? 'none' : '1px solid #334155';
+        
+        document.getElementById('tab-signup').style.background = view === 'signup' ? '#10b981' : 'transparent';
+        document.getElementById('tab-signup').style.border = view === 'signup' ? 'none' : '1px solid #334155';
+    }
+</script>
+
+<!-- MAIN APP (Hidden until logged in) -->
+<div class="app-window" style="display: none;">
+    
+    <!-- MOBILE TOP HEADER -->
+    <div class="mobile-header">
+        <button class="hamburger-btn" onclick="toggleMobileMenu()">☰</button>
+        <div class="thunder-brand" style="font-size: 18px;">
+            <svg width="18" height="24" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="thunder-icon"><path d="M13.3333 1.33334L1.33333 17.3333H12L10.6667 30.6667L22.6667 14.6667H12L13.3333 1.33334Z" fill="url(#paint_mob)"/><defs><linearGradient id="paint_mob" x1="12" y1="1.33334" x2="12" y2="30.6667" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0844"/><stop offset="1" stop-color="#FFB199"/></linearGradient></defs></svg>
+            <span>THUNDER</span>
+        </div>
+        <button class="theme-switch-btn-mobile" onclick="toggleDarkMode()" id="theme-btn-mobile">🌙</button>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleMobileMenu()"></div>
+
+    <!-- LEFT SIDEBAR / MENU -->
+    <aside class="sidebar" id="sidebar">
+        <div class="thunder-wrapper">
+            <div class="thunder-brand">
+                <svg width="24" height="32" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="thunder-icon"><path d="M13.3333 1.33334L1.33333 17.3333H12L10.6667 30.6667L22.6667 14.6667H12L13.3333 1.33334Z" fill="url(#paint0_linear)"/><defs><linearGradient id="paint0_linear" x1="12" y1="1.33334" x2="12" y2="30.6667" gradientUnits="userSpaceOnUse"><stop stop-color="#FF0844"/><stop offset="1" stop-color="#FFB199"/></linearGradient></defs></svg>
+                <span>THUNDER</span>
+            </div>
+        </div>
+        
+        <div class="nav-menu">
+            <button class="tab-btn active" onclick="openTab(event, 'dashboard-section'); toggleMobileMenu(true)">📊 Dashboard</button>
+            <button class="tab-btn" onclick="openTab(event, 'entry-section'); toggleMobileMenu(true)">✍️ Data Entry</button>
+            <button class="tab-btn" onclick="openTab(event, 'expense-section'); toggleMobileMenu(true)">📉 Expense Ledger</button>
+            <button class="tab-btn" onclick="openTab(event, 'cash-section'); toggleMobileMenu(true)">💵 Cash Statement</button>
+            <button class="tab-btn" onclick="openTab(event, 'bank-section'); toggleMobileMenu(true)">🏦 Bank Statement</button>
+            <div style="height: 2px; background: rgba(0,0,0,0.05); margin: 20px 10px; border-radius: 5px;"></div>
+            <button class="tab-btn" onclick="openTab(event, 'settings-section'); toggleMobileMenu(true)">⚙️ App Settings</button>
+            <button id="audit-tab-btn" class="tab-btn" onclick="openTab(event, 'audit-section'); toggleMobileMenu(true)" style="display: none; color: #ef4444;">🛡️ Audit Trail</button>
+            <button id="hidden-search-tab" class="tab-btn" onclick="openTab(event, 'search-section')" style="display: none;">Search</button>
+            
+            <!-- NEW GLOBAL LOGOUT BUTTON -->
+            <button class="tab-btn" onclick="globalLogout()" style="color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); margin-top: 10px;">🚪 Sign Out</button>
+        </div>
+
+        <div style="margin-top: auto;">
+            <button class="theme-switch-btn" onclick="toggleDarkMode()" id="theme-btn">🌙 Switch to Dark Mode</button>
+        </div>
+    </aside>
+
+    <!-- RIGHT MAIN CONTENT -->
+    <main class="main-content">
+        
+        <!-- UNIVERSAL COMMAND CENTER -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; width: 100%; flex-wrap: wrap; gap: 10px;">
+            <button class="secondary-btn" onclick="document.querySelector('.tab-btn[onclick*=\'dashboard-section\']').click()" style="margin: 0; display: flex; align-items: center; gap: 8px; border-color: transparent; background: var(--card-bg); box-shadow: 0 4px 10px var(--shadow-base);">
+                📊 <span style="font-weight: 700;">Dashboard</span>
+            </button>
+
+            <!-- Top Right: Sort, Search & EXPORT Icons -->
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="global-sort-wrapper">
+                    <svg viewBox="0 0 24 24" class="sort-icon"><path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z"/></svg>
+                    <select id="global-sort" onchange="changeGlobalSort(this.value)" title="Sort Data">
+                        <option value="date-desc">Date (Newest)</option>
+                        <option value="date-asc">Date (Oldest)</option>
+                        <option value="amount-desc">Amount (Highest)</option>
+                        <option value="amount-asc">Amount (Lowest)</option>
+                        <option value="particulars-asc">Name (A-Z)</option>
+                        <option value="particulars-desc">Name (Z-A)</option>
+                    </select>
+                </div>
+                
+                <button class="search-action-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" onclick="exportTabToPDF()" title="Export Current View to PDF">
+                    <svg viewBox="0 0 24 24" fill="white"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                </button>
+
+                <button class="search-action-btn" onclick="document.getElementById('hidden-search-tab').click()" title="Advanced Search & Filter">
+                    <svg viewBox="0 0 24 24"><path d="M10 2a8 8 0 105.293 14.707l5 5a1 1 0 001.414-1.414l-5-5A8 8 0 0010 2zm0 2a6 6 0 110 12 6 6 0 010-12z"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- DASHBOARD OVERVIEW TAB -->
+        <div id="dashboard-section" class="tab-content active">
+            <div class="balance-container">
+                <div class="balance-card cash-card">
+                    <p class="balance-title">Total Cash Balance</p>
+                    <p class="balance-amount">₹<span id="live-cash">0</span></p>
+                </div>
+                <div class="balance-card bank-card">
+                    <p class="balance-title">Total Bank Balance</p>
+                    <p class="balance-amount">₹<span id="live-bank">0</span></p>
+                </div>
+                <div class="balance-card" style="background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: white;">
+                    <p class="balance-title">Expenses This Month</p>
+                    <p class="balance-amount">₹<span id="dash-month-expense">0</span></p>
+                </div>
+            </div>
+
+            <div class="flex-row chart-row" style="margin-bottom: 25px;">
+                <div class="data-card flex-1">
+                    <h2 style="font-size: 14px; margin-bottom: 10px;">Monthly Category Breakdown</h2>
+                    <div class="chart-wrapper">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+                <div class="data-card flex-1">
+                    <h2 style="font-size: 14px; margin-bottom: 10px;">6-Month Cash Flow (In vs Out)</h2>
+                    <div class="chart-wrapper">
+                        <canvas id="cashflowChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. DATA ENTRY TAB -->
+        <div id="entry-section" class="tab-content">
+            <div class="form-box">
+                <h2>Record New Transaction</h2>
+                <form id="entry-form">
+                    <div class="flex-row">
+                        <div class="flex-1"><label>Date</label><input type="date" id="date" required></div>
+                        <div class="flex-1"><label>Entry Type</label><select id="type" required><option value="">Select Type...</option><option value="Expense">Expense</option><option value="Receipt">Receipt</option><option value="Contra">Contra</option></select></div>
+                        <div class="flex-1"><label>Recorded By (User)</label><select id="recorded-by" required><option value="Admin">Admin</option><option value="Editor">Editor</option><option value="System">System</option></select></div>
+                    </div>
+                    <label>Particulars / Name</label><input type="text" id="particulars" placeholder="What is this transaction for?" required>
+                    <div class="flex-row">
+                        <div class="flex-1"><label>Amount (₹)</label><input type="number" id="amount" placeholder="0" required></div>
+                        <div class="flex-1"><label>Account</label><select id="account" required><option value="">Select Account...</option><option value="Cash">Cash</option><option value="Bank Account">Bank</option></select></div>
+                    </div>
+                    <label>Category (For Expenses)</label><select id="category" required><option value="">Assign a Category...</option></select>
+                    <label>Additional Notes</label><input type="text" id="notes" placeholder="Any extra details?">
+                    <button type="submit" class="submit-btn" style="width: 100%; margin-top: 20px;">Save to Master Ledger</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 2. DEDICATED SEARCH & FILTER TAB -->
+        <div id="search-section" class="tab-content">
+            <div class="form-box">
+                <h2>Advanced Search & Filter</h2>
+                <div class="flex-row">
+                    <div style="flex: 2; min-width: 0;"><label style="margin-top:0;">Search Any Value:</label><input type="text" id="uni-search" placeholder="Type a name, category, or amount..."></div>
+                    <div class="flex-1"><label style="margin-top:0;">Transaction Type:</label><select id="uni-type"><option value="">All Types</option><option value="Expense">Expense</option><option value="Receipt">Receipt</option><option value="Contra">Contra</option></select></div>
+                </div>
+                <div class="flex-row" style="margin-top: 15px;">
+                    <div class="flex-1"><label style="margin-top:0;">From Date:</label><input type="date" id="uni-start"></div>
+                    <div class="flex-1"><label style="margin-top:0;">To Date:</label><input type="date" id="uni-end"></div>
+                    <div class="flex-1"><label style="margin-top:0;">Sort By:</label><select id="uni-sort"><option value="date-desc">Date (Newest First)</option><option value="date-asc">Date (Oldest First)</option><option value="amount-desc">Amount (Highest First)</option><option value="amount-asc">Amount (Lowest First)</option></select></div>
+                </div>
+                <div class="flex-row" style="margin-top: 20px;">
+                    <button class="action-btn flex-1" onclick="runUniversalSearch()" style="margin:0;">Apply Filters & Sort</button>
+                    <button class="secondary-btn flex-1" onclick="clearUniversalSearch()" style="margin:0;">Clear & Reset</button>
+                </div>
+            </div>
+            <div class="data-card">
+                <h2>Search Results</h2>
+                <div class="table-wrapper">
+                    <table id="search-table"><thead><tr><th>Date</th><th>Particulars</th><th>Type</th><th>Account</th><th>Amount</th><th>Action</th></tr></thead><tbody id="search-table-body"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. EXPENSE LEDGER -->
+        <div id="expense-section" class="tab-content">
+            <div class="data-card">
+                <h2>Expense Ledger</h2>
+                <div class="view-controls">
+                    <div class="view-selector">
+                        <button class="view-btn active" onclick="setView('expense-section', 'This Month', this)">This Month</button>
+                        <button class="view-btn" onclick="setView('expense-section', 'This Week', this)">This Week</button>
+                        <button class="view-btn" onclick="setView('expense-section', 'Category Month', this)">Category Month</button>
+                        <button class="view-btn" onclick="setView('expense-section', 'Category', this)">Category</button>
+                        <button class="view-btn" onclick="setView('expense-section', 'All', this)">All</button>
+                        <button class="view-btn" onclick="setView('expense-section', 'All Month', this)">All Month</button>
+                    </div>
+                    <div class="view-actions">
+                        <div id="sub-filter-container-expense-section" style="display: none;"></div>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table id="expense-table">
+                        <thead><tr><th>Date</th><th>Particulars</th><th>Category</th><th>Account</th><th>Amount</th><th>Note</th><th>Action</th></tr></thead>
+                        <tbody id="expense-table-body"></tbody>
+                        <tfoot id="expense-table-foot"></tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 4. CASH STATEMENT -->
+        <div id="cash-section" class="tab-content">
+            <div class="data-card">
+                <h2>Cash Statement</h2>
+                <div class="view-controls">
+                    <div class="view-selector">
+                        <button class="view-btn active" onclick="setView('cash-section', 'This Month', this)">This Month</button>
+                        <button class="view-btn" onclick="setView('cash-section', 'This Week', this)">This Week</button>
+                        <button class="view-btn" onclick="setView('cash-section', 'All', this)">All</button>
+                        <button class="view-btn" onclick="setView('cash-section', 'All Month', this)">All Month</button>
+                    </div>
+                    <div class="view-actions">
+                        <div id="sub-filter-container-cash-section" style="display: none;"></div>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table id="cash-table">
+                        <thead><tr><th>Date</th><th>Particulars</th><th>Type</th><th>Amount</th><th>Note</th><th>Action</th></tr></thead>
+                        <tbody id="cash-table-body"></tbody>
+                        <tfoot id="cash-table-foot"></tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 5. BANK STATEMENT -->
+        <div id="bank-section" class="tab-content">
+            <div class="data-card">
+                <h2>Bank Statement</h2>
+                <div class="view-controls">
+                    <div class="view-selector">
+                        <button class="view-btn active" onclick="setView('bank-section', 'This Month', this)">This Month</button>
+                        <button class="view-btn" onclick="setView('bank-section', 'This Week', this)">This Week</button>
+                        <button class="view-btn" onclick="setView('bank-section', 'All', this)">All</button>
+                        <button class="view-btn" onclick="setView('bank-section', 'All Month', this)">All Month</button>
+                    </div>
+                    <div class="view-actions">
+                        <div id="sub-filter-container-bank-section" style="display: none;"></div>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table id="bank-table">
+                        <thead><tr><th>Date</th><th>Particulars</th><th>Type</th><th>Amount</th><th>Note</th><th>Action</th></tr></thead>
+                        <tbody id="bank-table-body"></tbody>
+                        <tfoot id="bank-table-foot"></tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. AUDIT TRAIL -->
+        <div id="audit-section" class="tab-content">
+            <div class="data-card">
+                <h2 style="color: #ef4444;">Audit Trail</h2>
+                <div class="table-wrapper">
+                    <table id="audit-table">
+                        <thead><tr><th>Log Date</th><th>Status</th><th>Original Details</th><th>Recorded By</th><th>Action</th></tr></thead>
+                        <tbody id="audit-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="pagination-controls" class="form-box flex-row" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 15px;">
+            <button class="secondary-btn" onclick="prevPage()">⬅️ Previous</button>
+            <span id="page-info" style="font-weight: 700; color: #667eea; font-size: 13px;">Page 1</span>
+            <button class="secondary-btn" onclick="nextPage()">Next ➡️</button>
+        </div>
+
+        <!-- SETTINGS -->
+        <div id="settings-section" class="tab-content">
+            
+            <div id="admin-login-box" class="admin-panel">
+                <h2 style="color: #ff0844; margin-bottom: 5px;">Administrator Access</h2>
+                <p style="font-size: 13px; color: #94a3b8; margin-bottom: 20px;">Enter your admin email to receive a secure login link.</p>
+                
+                <form id="firebase-login-form" class="flex-row" style="align-items: flex-end;">
+                    <div class="flex-1">
+                        <label style="margin-top:0;">Admin Email</label>
+                        <input type="text" id="admin-email" placeholder="admin@example.com" required>
+                    </div>
+                    <button type="submit" class="action-btn" style="margin: 0; min-width: 150px;" id="send-link-btn">Send Login Link</button>
+                </form>
+                
+                <div id="email-sent-msg" style="display: none; margin-top: 15px; color: #10b981; font-weight: bold;">
+                    ✅ Secure link sent! Please check your inbox.
+                </div>
+            </div>
+
+            <div id="admin-zone" style="display: none;">
+                
+                <div class="form-box" style="border: 2px solid #10b981;">
+                    <h2 style="color: #10b981;">📄 Master PDF Export</h2>
+                    <div class="flex-row">
+                        <div class="flex-1"><label style="margin-top:0;">Start Date</label><input type="date" id="master-export-start"></div>
+                        <div class="flex-1"><label style="margin-top:0;">End Date</label><input type="date" id="master-export-end"></div>
+                    </div>
+                    <button class="action-btn" style="width: 100%; margin-top: 15px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);" onclick="generateMasterPDF()">Generate Master Report</button>
+                </div>
+
+                <div class="form-box">
+                    <h2>App Preferences</h2>
+                    <div class="flex-row">
+                        <div class="flex-1">
+                            <label style="margin-top:0;">Week Start Day</label>
+                            <select id="week-start-day" onchange="saveWeekStartDay()"><option value="1">Monday</option><option value="0">Sunday</option><option value="6">Saturday</option></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-box">
+                    <h2>Manage Categories</h2>
+                    <form id="category-form" class="flex-row" style="margin-bottom: 15px;">
+                        <div class="flex-1"><label style="margin-top:0;">Create Category</label><input type="text" id="new-category-name" placeholder="e.g. Travel..." required></div>
+                        <button type="submit" class="action-btn" style="margin: 0;">Add</button>
+                    </form>
+                    <div class="table-wrapper"><table><thead><tr><th>Category Name</th><th style="width: 100px;">Action</th></tr></thead><tbody id="category-table-body"></tbody></table></div>
+                </div>
+
+                <div class="form-box">
+                    <h2>Editor Credentials</h2>
+                    <form id="editor-creds-form" class="flex-row">
+                        <div class="flex-1"><label style="margin-top:0;">Username</label><input type="text" id="set-editor-username" required></div>
+                        <div class="flex-1"><label style="margin-top:0;">Password</label><input type="password" id="set-editor-pass" required></div>
+                        <button type="submit" class="action-btn" style="margin: 0;">Save Setup</button>
+                    </form>
+                </div>
+
+                <div class="form-box">
+                    <h2>Master Opening Balances</h2>
+                    <form id="balance-form" class="flex-row">
+                        <div class="flex-1"><label style="margin-top:0;">Cash (₹)</label><input type="number" id="opening-cash" required></div>
+                        <div class="flex-1"><label style="margin-top:0;">Bank (₹)</label><input type="number" id="opening-bank" required></div>
+                        <button type="submit" class="action-btn" style="margin: 0;">Override</button>
+                    </form>
+                </div>
+
+                <div class="danger-panel">
+                    <h2 style="color: #ef4444;">🚨 Critical Operations</h2>
+                    <div style="margin-bottom: 30px; background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--danger-border);">
+                        <h4>Factory Reset Balances</h4>
+                        <button class="secondary-btn" onclick="requestOTP()" style="margin-bottom: 15px; margin-top: 5px; border-color: #ef4444; color: #ef4444;">📩 Request OTP</button>
+                        <div class="flex-row">
+                            <input type="text" id="reset-otp" placeholder="6-digit OTP" class="flex-1">
+                            <input type="text" id="reset-phrase" placeholder="Type: CLEAR-BALANCES-PERMANENTLY" class="flex-1">
+                            <button onclick="executeReset()" style="background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%); color: white; border-radius: 10px; padding: 12px 20px; font-weight:bold; border:none; cursor:pointer; margin: 0;">Execute</button>
+                        </div>
+                    </div>
+                    <div style="background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--danger-border);">
+                        <h4>Deep Clean Database</h4>
+                        <div id="wipe-request-box"><button class="secondary-btn" onclick="requestWipe()" style="border-color: #ea580c; color: #ea580c; margin-top: 5px;">⏳ Initiate 24-Hour Timer</button></div>
+                        <div id="wipe-execute-box" style="display: none;">
+                            <p id="cooling-timer" style="color: #ea580c; font-weight: 700; margin: 10px 0; background:var(--danger-bg); padding: 10px; border-radius: 8px;"></p>
+                            <button class="secondary-btn" onclick="requestOTP()" style="margin-bottom: 15px; border-color: #ef4444; color: #ef4444;">📩 Request OTP</button>
+                            <div class="flex-row">
+                                <input type="text" id="wipe-otp" placeholder="OTP" class="flex-1">
+                                <input type="text" id="wipe-phrase" placeholder="Type: DEEP-CLEAN-ALL-DATA" class="flex-1">
+                                <button onclick="executeWipe()" style="background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%); color: white; border-radius: 10px; padding: 12px 20px; font-weight:bold; border:none; cursor:pointer; margin: 0;">Erase All Data</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="logoutAdmin()" class="secondary-btn" style="width: 100%; padding: 14px; margin-top: 10px;">🚪 Log Out of Settings</button>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- COMPACT DESKTOP EDIT TRANSACTION MODAL -->
+<div id="edit-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); justify-content: center; align-items: center; z-index: 1000; padding: 20px;">
+    <div class="form-box hide-scrollbar" style="width: 100%; max-width: 850px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); max-height: 95vh; overflow-y: auto; padding: 30px;">
+        <h2 style="margin-bottom: 15px;">✏️ Edit Record</h2>
+        <form id="edit-form">
+            <input type="hidden" id="edit-id">
+            <div class="flex-row" style="margin-bottom: 15px;">
+                <div class="flex-1"><label style="margin-top:0;">Date</label><input type="date" id="edit-date" required></div>
+                <div class="flex-1"><label style="margin-top:0;">Type</label><select id="edit-type" required><option value="Expense">Expense</option><option value="Receipt">Receipt</option><option value="Contra">Contra</option></select></div>
+                <div class="flex-1"><label style="margin-top:0;">Account</label><select id="edit-account" required><option value="Cash">Cash</option><option value="Bank Account">Bank Account</option></select></div>
+            </div>
+            <div class="flex-row" style="margin-bottom: 15px;">
+                <div style="flex: 2; min-width: 0;"><label style="margin-top:0;">Particulars</label><input type="text" id="edit-particulars" required></div>
+                <div class="flex-1"><label style="margin-top:0;">Amount (₹)</label><input type="number" id="edit-amount" required></div>
+                <div class="flex-1"><label style="margin-top:0;">Category</label><select id="edit-category"></select></div>
+            </div>
+            <div class="flex-row" style="margin-bottom: 20px;">
+                <div style="flex: 2; min-width: 0;"><label style="margin-top:0;">Note</label><input type="text" id="edit-notes"></div>
+                <div class="flex-1"><label style="margin-top:0;">Recorded By</label><select id="edit-recorded-by" required><option value="Admin">Admin</option><option value="Editor">Editor</option><option value="System">System</option></select></div>
+            </div>
+            <div style="background: var(--sidebar-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color);">
+                <h4 style="margin: 0 0 10px 0; color: var(--input-focus);">Editor Authorization Required</h4>
+                <div class="flex-row">
+                    <input type="text" id="auth-editor-username" placeholder="Username" class="flex-1" required>
+                    <input type="password" id="auth-editor-pass" placeholder="Password" class="flex-1" required>
+                </div>
+            </div>
+            <div class="flex-row" style="margin-top: 25px;">
+                <button type="submit" class="action-btn flex-1" style="margin:0;">Save Changes</button>
+                <button type="button" class="secondary-btn flex-1" onclick="closeEditModal()" style="margin:0;">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="module" src="app.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const savedTheme = localStorage.getItem('financeTrackerTheme');
+        const btnDesk = document.getElementById('theme-btn');
+        const btnMob = document.getElementById('theme-btn-mobile');
+        if (savedTheme === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
+            if(btnDesk) btnDesk.innerHTML = '☀️ Switch to Light Mode';
+            if(btnMob) btnMob.innerHTML = '☀️';
+        }
+        const savedWeekStart = localStorage.getItem('weekStartDay');
+        if (savedWeekStart) document.getElementById('week-start-day').value = savedWeekStart;
+    });
+
+    function toggleDarkMode() {
+        const body = document.body;
+        const btnDesk = document.getElementById('theme-btn');
+        const btnMob = document.getElementById('theme-btn-mobile');
+        if (body.getAttribute('data-theme') === 'dark') {
+            body.removeAttribute('data-theme');
+            localStorage.setItem('financeTrackerTheme', 'light');
+            if(btnDesk) btnDesk.innerHTML = '🌙 Switch to Dark Mode';
+            if(btnMob) btnMob.innerHTML = '🌙';
+        } else {
+            body.setAttribute('data-theme', 'dark');
+            localStorage.setItem('financeTrackerTheme', 'dark');
+            if(btnDesk) btnDesk.innerHTML = '☀️ Switch to Light Mode';
+            if(btnMob) btnMob.innerHTML = '☀️';
+        }
+        if(typeof renderDashboard === 'function') setTimeout(() => { renderDashboard(); }, 100);
+    }
+
+    function toggleMobileMenu(forceClose = false) {
+        if(window.innerWidth > 768) return; 
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        if (forceClose) {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        } else {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+    }
+</script>
+</body>
+</html>
