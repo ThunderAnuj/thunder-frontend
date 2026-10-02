@@ -108,7 +108,8 @@
             <button class="tab-btn" onclick="openTab(event, 'cash-section'); toggleMobileMenu(true)">💵 Cash Statement</button>
             <button class="tab-btn" onclick="openTab(event, 'bank-section'); toggleMobileMenu(true)">🏦 Bank Statement</button>
             <div style="height: 2px; background: rgba(0,0,0,0.05); margin: 20px 10px; border-radius: 5px;"></div>
-            <button class="tab-btn" onclick="openTab(event, 'settings-section'); toggleMobileMenu(true)">⚙️ App Settings</button>
+            <button class="tab-btn" onclick="openTab(event, 'profile-section'); toggleMobileMenu(true)">👤 My Profile</button>
+<button class="tab-btn" onclick="openTab(event, 'settings-section'); toggleMobileMenu(true)">⚙️ App Settings</button>
             <button id="audit-tab-btn" class="tab-btn" onclick="openTab(event, 'audit-section'); toggleMobileMenu(true)" style="display: none; color: #ef4444;">🛡️ Audit Trail</button>
             <button id="hidden-search-tab" class="tab-btn" onclick="openTab(event, 'search-section')" style="display: none;">Search</button>
             
@@ -331,24 +332,40 @@
             <button class="secondary-btn" onclick="nextPage()">Next ➡️</button>
         </div>
 
+        <!-- MY PROFILE SECTION -->
+        <div id="profile-section" class="tab-content" style="display: none;">
+            <div class="data-card" style="max-width: 500px; background: #1e293b; border: 1px solid #334155;">
+                <h2 style="color: #10b981; margin-bottom: 20px;">My Profile</h2>
+                <div style="display: flex; flex-direction: column; gap: 15px; color: #cbd5e1; font-size: 16px;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #334155; padding-bottom: 10px;">
+                        <strong>Username:</strong> <span id="profile-username" style="color: #10b981;">...</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #334155; padding-bottom: 10px;">
+                        <strong>Full Name:</strong> <span id="profile-fullname" style="color: white;">...</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #334155; padding-bottom: 10px;">
+                        <strong>Phone Number:</strong> <span id="profile-phone" style="color: white;">...</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <strong>Email Address:</strong> <span id="profile-email" style="color: #f43f5e;">...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- SETTINGS -->
         <div id="settings-section" class="tab-content">
             
-            <div id="admin-login-box" class="admin-panel">
-                <h2 style="color: #ff0844; margin-bottom: 5px;">Administrator Access</h2>
-                <p style="font-size: 13px; color: #94a3b8; margin-bottom: 20px;">Enter your admin email to receive a secure login link.</p>
+            <div id="admin-login-box" class="form-box" style="max-width: 500px;">
+                <h3 style="color: #f43f5e; margin-top: 0; margin-bottom: 15px;">Settings Authentication</h3>
+                <p style="color: #94a3b8; margin-bottom: 20px; font-size: 14px;">Enter your account Email and Password to unlock critical database settings.</p>
                 
-                <form id="firebase-login-form" class="flex-row" style="align-items: flex-end;">
-                    <div class="flex-1">
-                        <label style="margin-top:0;">Admin Email</label>
-                        <input type="text" id="admin-email" placeholder="admin@example.com" required>
-                    </div>
-                    <button type="submit" class="action-btn" style="margin: 0; min-width: 150px;" id="send-link-btn">Send Login Link</button>
+                <form id="settings-auth-form" style="display: flex; flex-direction: column; gap: 15px;">
+                    <input type="email" id="settings-email" placeholder="Account Email" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white;">
+                    <input type="password" id="settings-password" placeholder="Account Password" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white;">
+                    <button type="submit" class="action-btn" style="width: 100%; background: #6366f1; margin: 0; padding: 12px;">Unlock Settings</button>
+                    <p id="settings-auth-error" style="color: #ef4444; font-size: 13px; display: none; font-weight: bold; margin: 0; text-align: center;"></p>
                 </form>
-                
-                <div id="email-sent-msg" style="display: none; margin-top: 15px; color: #10b981; font-weight: bold;">
-                    ✅ Secure link sent! Please check your inbox.
-                </div>
             </div>
 
             <div id="admin-zone" style="display: none;">
