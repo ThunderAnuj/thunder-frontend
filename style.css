@@ -179,3 +179,46 @@ body.light-mode textarea {
 body.light-mode input::placeholder {
     color: #888888;
 }
+
+/* =========================================
+   LIGHT MODE OVERRIDES (CARDS & INPUTS)
+   ========================================= */
+
+/* 1. Fix the dark Profile Card & Settings Containers */
+body.light-mode #profile-section > div,
+body.light-mode .settings-card,
+body.light-mode .auth-box,
+body.light-mode .auth-container {
+    background-color: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important;
+}
+
+/* Force Profile text to be readable */
+body.light-mode #profile-section > div p,
+body.light-mode #profile-section > div h2,
+body.light-mode #profile-section > div span,
+body.light-mode #profile-section > div strong {
+    color: #1e293b !important;
+}
+
+/* 2. Fix all dark Input Fields (Sign Up & Settings Lock) */
+body.light-mode input,
+body.light-mode select,
+body.light-mode textarea {
+    background-color: #f8fafc !important;
+    color: #0f172a !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+body.light-mode input::placeholder,
+body.light-mode textarea::placeholder {
+    color: #64748b !important;
+}
+
+/* Ensure form labels are dark */
+body.light-mode label,
+body.light-mode .auth-box p,
+body.light-mode .settings-card p {
+    color: #475569 !important;
+}
