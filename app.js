@@ -130,8 +130,21 @@ window.saveWeekStartDay = function() { localStorage.setItem('weekStartDay', docu
 
 async function loadData() {
     enforceDateRules(); 
+    
+    // 1. Set to checking status
+    const statusEl = document.getElementById('server-status');
+    if (statusEl) {
+        statusEl.innerHTML = '🟡 Connecting...';
+        statusEl.style.color = '#eab308';
+        statusEl.style.background = 'rgba(234, 179, 8, 0.1)';
+    }
+
     try {
         const res = await fetch(`${API_URL}/transactions`, { headers: getAuthHeaders() });
+        
+        // If the server doesn't respond properly, throw an error to trigger the red badge
+        if (!res.ok) throw new Error('Server offline or auth failed');
+
         masterTransactions = await res.json();
         const auditRes = await fetch(`${API_URL}/audit`, { headers: getAuthHeaders() });
         masterAuditLogs = await auditRes.json();
@@ -154,8 +167,23 @@ async function loadData() {
         if(!document.getElementById('dashboard-section').classList.contains('active')) {
             processAndRenderTables();
         }
+
+        // 2. Set to success status
+        if (statusEl) {
+            statusEl.innerHTML = '🟢 Connected';
+            statusEl.style.color = '#10b981';
+            statusEl.style.background = 'rgba(16, 185, 129, 0.1)';
+        }
+
     } catch (error) {
         console.error("Error connecting to Vault:", error);
+        
+        // 3. Set to failed status
+        if (statusEl) {
+            statusEl.innerHTML = '🔴 Offline / Error';
+            statusEl.style.color = '#ef4444';
+            statusEl.style.background = 'rgba(239, 68, 68, 0.1)';
+        }
     }
 }
 
@@ -985,9 +1013,9 @@ document.getElementById('factory-reset-btn').addEventListener('click', async () 
     }
     
     try {
-        const res = await fetch('/api/reset-balances', {
+        const res = await fetch(`${API_URL}/reset-balances`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getAuthHeaders(true), // <-- UPDATE THIS LINE
             body: JSON.stringify({ userId: auth.currentUser.uid })
         });
         if(res.ok) {
@@ -1046,9 +1074,9 @@ function updateTimerUI() {
 
 async function executeDeepClean() {
     try {
-        const res = await fetch('/api/deep-clean', {
+        const res = await fetch(`${API_URL}/deep-clean`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getAuthHeaders(true), // <-- UPDATE THIS LINE
             body: JSON.stringify({ userId: auth.currentUser.uid })
         });
         if(res.ok) {
@@ -1066,9 +1094,9 @@ window.restoreTransaction = async function(transactionId, originalAmount, logId)
     if(!confirm(`Are you sure you want to restore this transaction to ₹${originalAmount}?`)) return;
 
     try {
-        const res = await fetch(`/api/restore-transaction/${transactionId}`, {
+        const res = await fetch(`${API_URL}/restore-transaction/${transactionId}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getAuthHeaders(true), // <-- UPDATE THIS LINE
             body: JSON.stringify({ 
                 userId: auth.currentUser.uid,
                 amount: Number(originalAmount),

@@ -168,57 +168,46 @@ tfoot td { position: sticky; bottom: 0; background: var(--card-bg); z-index: 10;
     .edit-btn, .del-btn { flex: 1; margin: 0 !important; padding: 10px !important; font-size: 13px; border-radius: 8px; text-align: center;}
     td[data-label="Amount"] span { padding: 1px 4px !important; font-size: 9px !important; border-radius: 3px !important; }
 }
-/* LIGHT MODE INPUT FIXES */
-body.light-mode input, 
-body.light-mode select, 
-body.light-mode textarea {
-    background-color: #ffffff;
-    color: #1a1a2e;
-    border: 1px solid #ccc;
-}
-body.light-mode input::placeholder {
-    color: #888888;
-}
 
 /* =========================================
    LIGHT MODE OVERRIDES (CARDS & INPUTS)
    ========================================= */
 
 /* 1. Fix the dark Profile Card & Settings Containers */
-body.light-mode #profile-section > div,
-body.light-mode .settings-card,
-body.light-mode .auth-box,
-body.light-mode .auth-container {
+body:not([data-theme="dark"]) #profile-section > div,
+body:not([data-theme="dark"]) .settings-card,
+body:not([data-theme="dark"]) .auth-box,
+body:not([data-theme="dark"]) .auth-container {
     background-color: #ffffff !important;
     border: 1px solid #e2e8f0 !important;
     box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important;
 }
 
 /* Force Profile text to be readable */
-body.light-mode #profile-section > div p,
-body.light-mode #profile-section > div h2,
-body.light-mode #profile-section > div span,
-body.light-mode #profile-section > div strong {
+body:not([data-theme="dark"]) #profile-section > div p,
+body:not([data-theme="dark"]) #profile-section > div h2,
+body:not([data-theme="dark"]) #profile-section > div span,
+body:not([data-theme="dark"]) #profile-section > div strong {
     color: #1e293b !important;
 }
 
 /* 2. Fix all dark Input Fields (Sign Up & Settings Lock) */
-body.light-mode input,
-body.light-mode select,
-body.light-mode textarea {
+body:not([data-theme="dark"]) input,
+body:not([data-theme="dark"]) select,
+body:not([data-theme="dark"]) textarea {
     background-color: #f8fafc !important;
     color: #0f172a !important;
     border: 1px solid #cbd5e1 !important;
 }
 
-body.light-mode input::placeholder,
-body.light-mode textarea::placeholder {
+body:not([data-theme="dark"]) input::placeholder,
+body:not([data-theme="dark"]) textarea::placeholder {
     color: #64748b !important;
 }
 
 /* Ensure form labels are dark */
-body.light-mode label,
-body.light-mode .auth-box p,
-body.light-mode .settings-card p {
+body:not([data-theme="dark"]) label,
+body:not([data-theme="dark"]) .auth-box p,
+body:not([data-theme="dark"]) .settings-card p {
     color: #475569 !important;
 }
